@@ -59,7 +59,7 @@ public class BasicOpMode_Linear extends LinearOpMode {
     private DcMotor Left_Drive_Motor = null;
     private DcMotor Right_Drive_Motor = null;
     private DcMotor Right_Lift_Motor = null;
-    private DcMotor Left_Lift_Controller = null;
+    private DcMotor Left_Lift_Motor = null;
     private DcMotor Lift_Angle_Motor = null;
     private DcMotor Flywheel_Motor = null;
 
@@ -74,7 +74,7 @@ public class BasicOpMode_Linear extends LinearOpMode {
         Left_Drive_Motor  = hardwareMap.get(DcMotor.class, "Left_Drive_Motor");
         Right_Drive_Motor = hardwareMap.get(DcMotor.class, "Right_Drive_Motor");
         Right_Lift_Motor = hardwareMap.get(DcMotor.class, "Right_Lift_Motor" );
-        Left_Lift_Controller = hardwareMap.get(DcMotor.class, "Left_Lift_Motor");
+        Left_Lift_Motor = hardwareMap.get(DcMotor.class, "Left_Lift_Motor");
         Lift_Angle_Motor = hardwareMap.get(DcMotor.class, "Lift_Angle_Motor");
         Flywheel_Motor = hardwareMap.get(DcMotor.class, "Flywheel_Motor");
 
@@ -85,7 +85,7 @@ public class BasicOpMode_Linear extends LinearOpMode {
         Left_Drive_Motor.setDirection(DcMotor.Direction.REVERSE);
 
         //Set Start power to motors
-        Left_Lift_Controller.setPower(0);
+        Left_Lift_Motor.setPower(0);
         Left_Drive_Motor.setPower(0);
         Right_Drive_Motor.setPower(0);
         Right_Lift_Motor.setPower(0);
@@ -100,8 +100,11 @@ public class BasicOpMode_Linear extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
-            double leftPower;
-            double rightPower;
+            double DriveLeftPower;
+            double DriveRightPower;
+            double LiftLeftPower;
+            double LiftRightPower;
+
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
@@ -111,20 +114,25 @@ public class BasicOpMode_Linear extends LinearOpMode {
             //double drive = -gamepad1.left_stick_y;
             //double turn  =  gamepad1.right_stick_x;
             //    = Range.clip(drive + turn, -1.0, 1.0) ;
-           // rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+            // rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
 
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-             leftPower  = -gamepad1.left_stick_y ;
-             rightPower = -gamepad1.right_stick_y ;
+            // set power for each motor
+            DriveLeftPower  = -gamepad1.left_stick_y ;
+            DriveRightPower = -gamepad1.right_stick_y ;
+            LiftLeftPower = -gamepad2.left_stick_y;
+            LiftRightPower = -gamepad2.right_stick_y;
 
             // Send calculated power to wheels
-            Left_Drive_Motor.setPower(leftPower);
-            Right_Drive_Motor.setPower(rightPower);
+            Left_Drive_Motor.setPower(DriveLeftPower);
+            Right_Drive_Motor.setPower(DriveRightPower);
+
+            //Send Calclated power to lifts
+            Left_Lift_Motor.setPower(LiftLeftPower);
+            Right_Lift_Motor.setPower(LiftRightPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+            telemetry.addData("Motors", "left (%.2f), right (%.2f)", DriveLeftPower, DriveRightPower);
             telemetry.update();
         }
     }

@@ -37,26 +37,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 
-/**
- * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
- * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
- * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
- * It includes all the skeletal structure that all linear OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-
 @TeleOp(name="Tank_Drive", group="GameCode")
 
 public class BasicOpMode_Linear extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor Left_Drive_Motor = null;
+    private DcMotor Left_Drive_Motor= null;
     private DcMotor Right_Drive_Motor = null;
     private DcMotor Right_Lift_Motor = null;
     private DcMotor Left_Lift_Motor = null;
@@ -79,7 +66,6 @@ public class BasicOpMode_Linear extends LinearOpMode {
         Flywheel_Motor = hardwareMap.get(DcMotor.class, "Flywheel_Motor");
 
 
-        // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         Right_Drive_Motor.setDirection(DcMotor.Direction.FORWARD);
         Left_Drive_Motor.setDirection(DcMotor.Direction.REVERSE);
@@ -105,30 +91,58 @@ public class BasicOpMode_Linear extends LinearOpMode {
             double LiftLeftPower;
             double LiftRightPower;
 
-
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-            //double drive = -gamepad1.left_stick_y;
-            //double turn  =  gamepad1.right_stick_x;
-            //    = Range.clip(drive + turn, -1.0, 1.0) ;
-            // rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
-
             // set power for each motor
-            DriveLeftPower  = -gamepad1.left_stick_y ;
-            DriveRightPower = -gamepad1.right_stick_y ;
-            LiftLeftPower = -gamepad2.left_stick_y;
-            LiftRightPower = -gamepad2.right_stick_y;
+            DriveLeftPower  = -gamepad1.left_stick_y - .2;
+            DriveRightPower = -gamepad1.right_stick_y - .2;
+            LiftLeftPower = -gamepad2.left_stick_y - .2;
+            LiftRightPower = -gamepad2.right_stick_y - .2;
+
 
             // Send calculated power to wheels
             Left_Drive_Motor.setPower(DriveLeftPower);
             Right_Drive_Motor.setPower(DriveRightPower);
 
-            //Send Calclated power to lifts
-            Left_Lift_Motor.setPower(LiftLeftPower);
-            Right_Lift_Motor.setPower(LiftRightPower);
+            //Send Calculated power to lifts
+            Left_Lift_Motor.setPower(LiftLeftPower - .2);
+            Right_Lift_Motor.setPower(LiftRightPower - .2);
+
+            //Lift Angle Motor power bond to triggers
+            if (gamepad1.right_trigger == 1){
+                Lift_Angle_Motor.setPower(.5);
+            }
+            else{
+                Lift_Angle_Motor.setPower(0);
+            }
+            if (gamepad1.left_trigger == 1){
+                Lift_Angle_Motor.setPower(-.5);
+            }
+            else{
+                Lift_Angle_Motor.setPower(0);
+            }
+
+            //A and B button toggle for fly wheel moors.
+            double lifton;
+            double reversefly;
+            lifton = 0;
+            reversefly = 0;
+            if (gamepad2.a){
+                lifton = 1;
+            }
+            if (gamepad2.b){
+                lifton = 0;
+            }
+            if (gamepad2.x){
+                reversefly = 1;
+            }
+            if (lifton == 1){
+                Flywheel_Motor.setPower(.8);
+            }
+            if (lifton == 0){
+                Flywheel_Motor.setPower(0);
+            }
+            if (lifton == 0 && reversefly ==1 ){
+                Flywheel_Motor.setPower(-.8);
+            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
